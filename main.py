@@ -24,30 +24,30 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
 
 html, body, [class*="css"] {
-    background-color: #0a0e17 !important;
-    color: #c9d1d9 !important;
+    background-color: #ffffff !important;
+    color: #1a1a2e !important;
     font-family: 'Rajdhani', sans-serif !important;
 }
 
-.stApp { background-color: #0a0e17 !important; }
+.stApp { background-color: #ffffff !important; }
 
-h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !important; font-weight: 700 !important; }
+h1, h2, h3 { color: #1f6feb !important; font-family: 'Rajdhani', sans-serif !important; font-weight: 700 !important; }
 
 [data-testid="metric-container"] {
-    background: #0d1117 !important;
-    border: 1px solid #21262d !important;
+    background: #f6f8fa !important;
+    border: 1px solid #d0d7de !important;
     border-radius: 8px !important;
     padding: 12px 16px !important;
 }
 [data-testid="metric-container"] label {
-    color: #8b949e !important;
+    color: #57606a !important;
     font-family: 'Share Tech Mono', monospace !important;
     font-size: 11px !important;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 [data-testid="metric-container"] [data-testid="stMetricValue"] {
-    color: #e6edf3 !important;
+    color: #1a1a2e !important;
     font-family: 'Share Tech Mono', monospace !important;
     font-size: 22px !important;
 }
@@ -79,14 +79,14 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     animation: pulse-red 1.5s infinite;
 }
 .signal-none {
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-left: 4px solid #484f58;
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-left: 4px solid #8c959f;
     border-radius: 8px;
     padding: 16px 20px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 14px;
-    color: #8b949e;
+    color: #57606a;
     text-align: center;
 }
 
@@ -100,8 +100,8 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
 }
 
 .stDataFrame {
-    background: #0d1117 !important;
-    border: 1px solid #21262d !important;
+    background: #f6f8fa !important;
+    border: 1px solid #d0d7de !important;
     border-radius: 8px !important;
 }
 .stDownloadButton button {
@@ -112,37 +112,37 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     font-family: 'Rajdhani', sans-serif !important;
     font-weight: 600 !important;
 }
-.stSidebar { background-color: #0d1117 !important; border-right: 1px solid #21262d !important; }
+.stSidebar { background-color: #f6f8fa !important; border-right: 1px solid #d0d7de !important; }
 .stSelectbox > div, .stTextInput > div > div {
-    background-color: #161b22 !important;
-    border-color: #30363d !important;
-    color: #e6edf3 !important;
+    background-color: #ffffff !important;
+    border-color: #d0d7de !important;
+    color: #1a1a2e !important;
 }
 .refresh-bar {
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
-    color: #8b949e;
+    color: #57606a;
     padding: 4px 0;
 }
 div[data-testid="stInfo"] {
-    background: #0d1f36 !important;
-    border: 1px solid #1f6feb44 !important;
+    background: #ddf4ff !important;
+    border: 1px solid #54aeff44 !important;
     border-radius: 8px !important;
-    color: #79c0ff !important;
+    color: #0550ae !important;
     font-family: 'Share Tech Mono', monospace !important;
     font-size: 12px !important;
 }
 .stButton button {
-    background: #21262d !important;
-    color: #e6edf3 !important;
-    border: 1px solid #30363d !important;
+    background: #f6f8fa !important;
+    color: #1a1a2e !important;
+    border: 1px solid #d0d7de !important;
     border-radius: 6px !important;
     font-family: 'Rajdhani', sans-serif !important;
     font-weight: 600 !important;
 }
 .stButton button:hover {
-    background: #30363d !important;
-    border-color: #58a6ff !important;
+    background: #e8f0fe !important;
+    border-color: #1f6feb !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -450,8 +450,10 @@ if current_sig == "NO TRADE":
 else:
     st.session_state.last_signal[selected_name] = current_sig
 
-# --- Status bar ---
+# --- Status bar with inline countdown ---
 sound_status = "🔔 ON" if st.session_state.sound_enabled else "🔕 OFF"
+countdown_ph = st.empty()  # placeholder sits right here, next to status info
+
 st.info(
     f"🕒 Last Refresh (IST): {now_ist}  &nbsp;|&nbsp;  "
     f"Sound: {sound_status}  &nbsp;|&nbsp;  "
@@ -484,8 +486,7 @@ st.download_button(
     mime="text/csv"
 )
 
-# --- Auto-refresh countdown ---
-countdown_ph = st.empty()
+# --- Countdown runs here but displays ABOVE the table (placeholder set earlier) ---
 for remaining in range(REFRESH_SEC, 0, -1):
     countdown_ph.markdown(
         f"<div class='refresh-bar'>🔄 Next refresh in {remaining}s...</div>",
