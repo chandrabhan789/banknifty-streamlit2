@@ -33,21 +33,12 @@ html, body, [class*="css"] {
 
 h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !important; font-weight: 700 !important; }
 
-.metric-card {
-    background: #0d1117;
-    border: 1px solid #21262d;
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin: 4px 0;
-}
-
 [data-testid="metric-container"] {
     background: #0d1117 !important;
     border: 1px solid #21262d !important;
     border-radius: 8px !important;
     padding: 12px 16px !important;
 }
-
 [data-testid="metric-container"] label {
     color: #8b949e !important;
     font-family: 'Share Tech Mono', monospace !important;
@@ -55,7 +46,6 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-
 [data-testid="metric-container"] [data-testid="stMetricValue"] {
     color: #e6edf3 !important;
     font-family: 'Share Tech Mono', monospace !important;
@@ -75,7 +65,6 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     text-align: center;
     animation: pulse-green 1.5s infinite;
 }
-
 .signal-pe {
     background: linear-gradient(135deg, #2d0a0a, #3a0f0f);
     border: 1px solid #da3633;
@@ -89,7 +78,6 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     text-align: center;
     animation: pulse-red 1.5s infinite;
 }
-
 .signal-none {
     background: #0d1117;
     border: 1px solid #21262d;
@@ -104,12 +92,11 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
 
 @keyframes pulse-green {
     0%, 100% { box-shadow: 0 0 8px #3fb95040; }
-    50% { box-shadow: 0 0 24px #3fb95099; }
+    50%       { box-shadow: 0 0 24px #3fb95099; }
 }
-
 @keyframes pulse-red {
     0%, 100% { box-shadow: 0 0 8px #f8514940; }
-    50% { box-shadow: 0 0 24px #f8514999; }
+    50%       { box-shadow: 0 0 24px #f8514999; }
 }
 
 .stDataFrame {
@@ -117,7 +104,6 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     border: 1px solid #21262d !important;
     border-radius: 8px !important;
 }
-
 .stDownloadButton button {
     background: #1f6feb !important;
     color: white !important;
@@ -126,33 +112,18 @@ h1, h2, h3 { color: #58a6ff !important; font-family: 'Rajdhani', sans-serif !imp
     font-family: 'Rajdhani', sans-serif !important;
     font-weight: 600 !important;
 }
-
 .stSidebar { background-color: #0d1117 !important; border-right: 1px solid #21262d !important; }
-
 .stSelectbox > div, .stTextInput > div > div {
     background-color: #161b22 !important;
     border-color: #30363d !important;
     color: #e6edf3 !important;
 }
-
 .refresh-bar {
     font-family: 'Share Tech Mono', monospace;
     font-size: 12px;
     color: #8b949e;
     padding: 4px 0;
 }
-
-.sound-toggle {
-    background: #161b22;
-    border: 1px solid #30363d;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin: 8px 0;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 14px;
-    color: #8b949e;
-}
-
 div[data-testid="stInfo"] {
     background: #0d1f36 !important;
     border: 1px solid #1f6feb44 !important;
@@ -161,16 +132,6 @@ div[data-testid="stInfo"] {
     font-family: 'Share Tech Mono', monospace !important;
     font-size: 12px !important;
 }
-
-div[data-testid="stWarning"] {
-    background: #1c1400 !important;
-    border: 1px solid #9e6a0344 !important;
-    border-radius: 8px !important;
-    color: #d29922 !important;
-    font-family: 'Share Tech Mono', monospace !important;
-    font-size: 13px !important;
-}
-
 .stButton button {
     background: #21262d !important;
     color: #e6edf3 !important;
@@ -179,7 +140,6 @@ div[data-testid="stWarning"] {
     font-family: 'Rajdhani', sans-serif !important;
     font-weight: 600 !important;
 }
-
 .stButton button:hover {
     background: #30363d !important;
     border-color: #58a6ff !important;
@@ -191,9 +151,7 @@ div[data-testid="stWarning"] {
 # SOUND ALERT via Web Audio API
 # -------------------------------
 def play_sound_alert(signal_type):
-    """Inject JS to play beep using Web Audio API — no file needed."""
     if signal_type == "CE BUY":
-        # Rising two-tone beep (positive)
         js_sound = """
         (function() {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -209,13 +167,12 @@ def play_sound_alert(signal_type):
                 o.start(ctx.currentTime + start);
                 o.stop(ctx.currentTime + start + dur + 0.05);
             }
-            beep(1320, 0,    0.15);
-            beep(1320, 0.2, 0.15);
+            beep(880,  0,   0.15);
+            beep(1100, 0.2, 0.15);
             beep(1320, 0.4, 0.25);
         })();
         """
     elif signal_type == "PE BUY":
-        # Falling two-tone beep (alert)
         js_sound = """
         (function() {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -231,22 +188,19 @@ def play_sound_alert(signal_type):
                 o.start(ctx.currentTime + start);
                 o.stop(ctx.currentTime + start + dur + 0.05);
             }
-            beep(1320, 0,    0.15);
-            beep(1320, 0.2,  0.15);
-            beep(1320,  0.4,  0.25);
+            beep(1320, 0,   0.15);
+            beep(1100, 0.2, 0.15);
+            beep(880,  0.4, 0.25);
         })();
         """
     else:
-        return  # No sound for NO TRADE
+        return
 
-    # Embed in hidden iframe so it doesn't take space
-    components.html(f"""
-        <script>{js_sound}</script>
-    """, height=0)
+    components.html(f"<script>{js_sound}</script>", height=0)
 
 
 # -------------------------------
-# DEFAULT SYMBOL LIST
+# SESSION STATE
 # -------------------------------
 if "symbols" not in st.session_state:
     st.session_state.symbols = {
@@ -275,7 +229,6 @@ SYMBOL = st.session_state.symbols[selected_name]
 
 st.sidebar.markdown("---")
 
-# Sound toggle
 sound_label = "🔔 Sound ON" if st.session_state.sound_enabled else "🔕 Sound OFF"
 if st.sidebar.button(sound_label):
     st.session_state.sound_enabled = not st.session_state.sound_enabled
@@ -299,7 +252,6 @@ if st.sidebar.button("Remove Symbol"):
     else:
         st.sidebar.warning("Need at least one symbol")
 
-# Sound legend
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div style='font-size:12px; color:#8b949e; font-family: monospace; line-height:1.8'>
@@ -307,51 +259,74 @@ st.sidebar.markdown("""
 ▲ CE BUY → Rising 3-tone beep<br>
 ▼ PE BUY → Falling 3-tone beep<br>
 <br>
-⚠️ Browser must be unmuted.<br>
-Click anywhere on page once<br>to activate audio context.
+⚠️ Click page once to activate audio.<br>
+Ensure browser tab is not muted.
 </div>
 """, unsafe_allow_html=True)
 
+
 # -------------------------------
-# DATA FUNCTION
+# DATA FUNCTION — signal logic exactly matches tkinter working code
 # -------------------------------
 @st.cache_data(ttl=REFRESH_SEC)
 def fetch_data(symbol):
-    df = yf.download(symbol, period="5d", interval="5m", progress=False)
 
-    if df.empty:
+    # FIX 1: auto_adjust=False — matches your tkinter code exactly
+    df = yf.download(
+        symbol,
+        period="5d",
+        interval="5m",
+        auto_adjust=False,
+        progress=False
+    )
+
+    if df is None or df.empty:
         return pd.DataFrame()
 
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 
     df.reset_index(inplace=True)
-    df['Datetime'] = (
-        pd.to_datetime(df['Datetime'], utc=True)
-        .dt.tz_convert(IST)
-        .dt.tz_localize(None)
-    )
+
+    # FIX 2: UTC→IST via simple Timedelta offset — matches your tkinter code exactly
+    df['Datetime'] = pd.to_datetime(df['Datetime']) + pd.Timedelta(hours=5, minutes=30)
     df.set_index('Datetime', inplace=True)
 
+    # NSE market hours filter
     if symbol.startswith("^"):
         df = df.between_time("09:15", "15:30").copy()
     else:
         df = df.copy()
 
-    df[['Open','High','Low','Close']] = df[['Open','High','Low','Close']].ffill()
+    # Clean numeric columns
+    for col in ['Open', 'High', 'Low', 'Close', 'Adj Close']:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    df[['Open', 'High', 'Low', 'Close']] = df[['Open', 'High', 'Low', 'Close']].ffill()
     df.dropna(subset=['Close'], inplace=True)
 
     if df.empty:
         return pd.DataFrame()
 
-    df['EMA20']    = EMAIndicator(df['Close'], window=20, fillna=True).ema_indicator()
-    stoch          = StochRSIIndicator(df['Close'], window=14, smooth1=3, smooth2=3, fillna=True)
+    # EMA 20
+    df['EMA20'] = EMAIndicator(close=df['Close'], window=20, fillna=True).ema_indicator()
+
+    # Stochastic RSI
+    stoch = StochRSIIndicator(
+        close=df['Close'],
+        window=14,
+        smooth1=3,
+        smooth2=3,
+        fillna=True
+    )
     df['StochRSI'] = stoch.stochrsi().squeeze()
 
+    # ---- Trend Logic: HH-HL = UP, LH-LL = DOWN ----
     trends = ["NA"]
     for i in range(1, len(df)):
-        ch, ph = df['High'].iloc[i], df['High'].iloc[i-1]
-        cl, pl = df['Low'].iloc[i],  df['Low'].iloc[i-1]
+        ch, ph = df['High'].iloc[i], df['High'].iloc[i - 1]
+        cl, pl = df['Low'].iloc[i],  df['Low'].iloc[i - 1]
         if ch > ph and cl > pl:
             trends.append("UP")
         elif ch < ph and cl < pl:
@@ -360,40 +335,65 @@ def fetch_data(symbol):
             trends.append("Sideways")
     df['Trend'] = trends
 
-    EMA_THRESHOLD_PCT = 0.005
+    # ---- Signal Logic — FIX 3: Exact match to tkinter code ----
+    # Uses abs(close - ema20) > 100 (hardcoded 100 pts, NOT percentage-based)
     signals, remarks = [], []
 
     for _, row in df.iterrows():
-        close  = float(row['Close'])
-        ema    = float(row['EMA20'])
-        stochv = float(row['StochRSI'])
         trend  = row['Trend']
-        r      = []
+        close  = float(row['Close'])
+        ema20  = float(row['EMA20'])
+        stochv = float(row['StochRSI'])
 
-        ema_pct = abs(close - ema) / ema if ema != 0 else 1
-        if ema_pct > EMA_THRESHOLD_PCT:
-            r.append(f"Price far from EMA20 ({ema_pct*100:.2f}%)")
+        remark = []
 
-        if trend == "UP" and ema_pct <= EMA_THRESHOLD_PCT and stochv < 0.3:
+        if abs(close - ema20) > 100:
+            remark.append("Price far from EMA20")
+
+        if trend == "UP" and abs(close - ema20) <= 100 and stochv < 0.3:
             signals.append("CE BUY")
-            remarks.append("HH-HL + EMA near + StochRSI < 0.3" + ("; " + "; ".join(r) if r else ""))
-        elif trend == "DOWN" and ema_pct <= EMA_THRESHOLD_PCT and stochv > 0.7:
+            remarks.append("HH-HL trend + EMA near + StochRSI < 0.3")
+
+        elif trend == "DOWN" and abs(close - ema20) <= 100 and stochv > 0.7:
             signals.append("PE BUY")
-            remarks.append("LH-LL + EMA near + StochRSI > 0.7" + ("; " + "; ".join(r) if r else ""))
+            remarks.append("LH-LL trend + EMA near + StochRSI > 0.7")
+
         else:
+            # FIX 4: Detailed NO TRADE remarks — exactly matches tkinter code
+            if trend == "Sideways":
+                remark.append("Market sideways")
+            if trend == "UP" and stochv >= 0.3:
+                remark.append("StochRSI not low enough for CE")
+            if trend == "DOWN" and stochv <= 0.7:
+                remark.append("StochRSI not high enough for PE")
+
             signals.append("NO TRADE")
-            remarks.append("; ".join(r) if r else "Conditions not met")
+            remarks.append("; ".join(remark))
 
     df['Signal'] = signals
     df['Remark'] = remarks
 
+    # FIX 5: Show latest trading day only — matches tkinter code
+    latest_day = df.index.date.max()
+    df = df[df.index.date == latest_day]
+
+    # Round display values
+    for col in ['Adj Close', 'Close', 'High', 'Low', 'Open', 'EMA20']:
+        if col in df.columns:
+            df[col] = df[col].round(2)
+
     return df.sort_index(ascending=False)
+
 
 # -------------------------------
 # MAIN UI
 # -------------------------------
 st.markdown("# 📊 Multi Asset Trading Dashboard")
-st.markdown("<div style='height:4px; background:linear-gradient(90deg,#1f6feb,#388bfd,#58a6ff20); border-radius:2px; margin-bottom:20px'></div>", unsafe_allow_html=True)
+st.markdown(
+    "<div style='height:4px; background:linear-gradient(90deg,#1f6feb,#388bfd,#58a6ff20);"
+    "border-radius:2px; margin-bottom:20px'></div>",
+    unsafe_allow_html=True
+)
 
 df = fetch_data(SYMBOL)
 
@@ -401,21 +401,21 @@ if df.empty:
     st.error("⚠️ No data received. Market may be closed or symbol invalid.")
     st.stop()
 
-latest       = df.iloc[0]
-current_sig  = latest['Signal']
-current_time = datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')
+latest      = df.iloc[0]
+current_sig = latest['Signal']
+now_ist     = datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')
 
 # --- Metrics row ---
 c1, c2, c3, c4, c5 = st.columns(5)
-c1.metric("Instrument",  selected_name)
-c2.metric("Close",       round(float(latest['Close']), 2))
-c3.metric("EMA20",       round(float(latest['EMA20']), 2))
-c4.metric("StochRSI",    round(float(latest['StochRSI']), 4))
-c5.metric("Trend",       latest['Trend'])
+c1.metric("Instrument", selected_name)
+c2.metric("Close",      round(float(latest['Close']), 2))
+c3.metric("EMA20",      round(float(latest['EMA20']), 2))
+c4.metric("StochRSI",   round(float(latest['StochRSI']), 4))
+c5.metric("Trend",      latest['Trend'])
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Signal display ---
+# --- Signal banner ---
 if current_sig == "CE BUY":
     st.markdown(f"""
     <div class="signal-ce">
@@ -439,22 +439,29 @@ else:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Sound alert logic ---
-# Only beep when signal CHANGES to a trade signal (avoids repeat beeping)
+# --- Sound alert: beep only when signal changes to a trade signal ---
 prev_sig = st.session_state.last_signal.get(selected_name, "")
 if st.session_state.sound_enabled:
     if current_sig in ("CE BUY", "PE BUY") and current_sig != prev_sig:
         play_sound_alert(current_sig)
-st.session_state.last_signal[selected_name] = current_sig
+# Reset last_signal when back to NO TRADE (so next signal fires again)
+if current_sig == "NO TRADE":
+    st.session_state.last_signal[selected_name] = ""
+else:
+    st.session_state.last_signal[selected_name] = current_sig
 
-# --- Info bar ---
+# --- Status bar ---
 sound_status = "🔔 ON" if st.session_state.sound_enabled else "🔕 OFF"
-st.info(f"🕒 Last Refresh (IST): {current_time}  &nbsp;|&nbsp;  Sound: {sound_status}  &nbsp;|&nbsp;  Auto-refresh every {REFRESH_SEC}s")
+st.info(
+    f"🕒 Last Refresh (IST): {now_ist}  &nbsp;|&nbsp;  "
+    f"Sound: {sound_status}  &nbsp;|&nbsp;  "
+    f"Auto-refresh every {REFRESH_SEC}s"
+)
 
 # --- Data table ---
-st.markdown("### 📋 Latest Candles")
+st.markdown("### 📋 Today's Candles")
 
-all_cols  = ['Close','High','Low','Open','Volume','EMA20','StochRSI','Trend','Signal','Remark']
+all_cols  = ['Close', 'High', 'Low', 'Open', 'Volume', 'EMA20', 'StochRSI', 'Trend', 'Signal', 'Remark']
 show_cols = [c for c in all_cols if c in df.columns]
 
 st.dataframe(
@@ -477,7 +484,7 @@ st.download_button(
     mime="text/csv"
 )
 
-# --- Auto-refresh countdown (no extra package) ---
+# --- Auto-refresh countdown ---
 countdown_ph = st.empty()
 for remaining in range(REFRESH_SEC, 0, -1):
     countdown_ph.markdown(
