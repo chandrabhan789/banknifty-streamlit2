@@ -5,7 +5,7 @@ from ta.trend import EMAIndicator
 from ta.momentum import StochRSIIndicator
 from datetime import datetime
 import pytz
-from streamlit_autorefresh import st_autorefresh
+import time
 
 # -------------------------------
 # CONFIG
@@ -14,8 +14,6 @@ st.set_page_config(page_title="Multi Asset Trading Dashboard", layout="wide")
 
 REFRESH_SEC = 15
 IST = pytz.timezone("Asia/Kolkata")
-
-st_autorefresh(interval=REFRESH_SEC * 1000, key="refresh")
 
 # -------------------------------
 # DEFAULT SYMBOL LIST
@@ -86,6 +84,7 @@ def fetch_data(symbol):
     if df.empty:
         return pd.DataFrame()
 
+    # Flatten MultiIndex columns if present
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
 
@@ -100,24 +99,35 @@ def fetch_data(symbol):
 
     df.set_index('Datetime', inplace=True)
 
-    # If NSE instrument, restrict time
+    # If NSE instrument, restrict to market hours
     if symbol.startswith("^"):
-        df = df.between_time("09:15", "15:30")
+        df = df.between_time("09:15", "15:30").copy()
+    else:
+        df = df.copy()
 
-    df[['Open','High','Low','Close']] = df[['Open','High','Low','Close']].ffill()
+    # Forward-fill OHLC safely
+    df[['Open', 'High', 'Low', 'Close']] = df[['Open', 'High', 'Low', 'Close']].ffill()
+
+    # Drop rows where Close is still NaN
+    df.dropna(subset=['Close'], inplace=True)
+
+    if df.empty:
+        return pd.DataFrame()
 
     # EMA
     df['EMA20'] = EMAIndicator(df['Close'], window=20, fillna=True).ema_indicator()
 
     # Stoch RSI
     stoch = StochRSIIndicator(df['Close'], window=14, smooth1=3, smooth2=3, fillna=True)
-    df['StochRSI'] = stoch.stochrsi()
+    df['StochRSI'] = stoch.stochrsi().squeeze()
 
-    # Trend
+    # Trend (computed on ascending data before sort)
     trends = ["NA"]
     for i in range(1, len(df)):
-        ch, ph = df['High'].iloc[i], df['High'].iloc[i-1]
-        cl, pl = df['Low'].iloc[i], df['Low'].iloc[i-1]
+        ch = df['High'].iloc[i]
+        ph = df['High'].iloc[i - 1]
+        cl = df['Low'].iloc[i]
+        pl = df['Low'].iloc[i - 1]
 
         if ch > ph and cl > pl:
             trends.append("UP")
@@ -128,36 +138,44 @@ def fetch_data(symbol):
 
     df['Trend'] = trends
 
-    # Signal
-    signals, remarks = [], []
+    # Percentage-based EMA proximity threshold (0.5%)
+    EMA_THRESHOLD_PCT = 0.005
+
+    # Signal generation
+    signals = []
+    remarks = []
 
     for _, row in df.iterrows():
-        close = row['Close']
-        ema = row['EMA20']
-        stochv = row['StochRSI']
-        trend = row['Trend']
+        close  = float(row['Close'])
+        ema    = float(row['EMA20'])
+        stochv = float(row['StochRSI'])
+        trend  = row['Trend']
 
         r = []
+        ema_distance_pct = abs(close - ema) / ema if ema != 0 else 1
 
-        if abs(close - ema) > 100:
-            r.append("Price far from EMA20")
+        if ema_distance_pct > EMA_THRESHOLD_PCT:
+            r.append(f"Price far from EMA20 ({ema_distance_pct * 100:.2f}%)")
 
-        if trend == "UP" and abs(close - ema) <= 100 and stochv < 0.3:
+        if trend == "UP" and ema_distance_pct <= EMA_THRESHOLD_PCT and stochv < 0.3:
             signals.append("CE BUY")
-            remarks.append("HH-HL + EMA near + StochRSI < 0.3")
+            base = "HH-HL + EMA near + StochRSI < 0.3"
+            remarks.append(base + ("; " + "; ".join(r) if r else ""))
 
-        elif trend == "DOWN" and abs(close - ema) <= 100 and stochv > 0.7:
+        elif trend == "DOWN" and ema_distance_pct <= EMA_THRESHOLD_PCT and stochv > 0.7:
             signals.append("PE BUY")
-            remarks.append("LH-LL + EMA near + StochRSI > 0.7")
+            base = "LH-LL + EMA near + StochRSI > 0.7"
+            remarks.append(base + ("; " + "; ".join(r) if r else ""))
 
         else:
             signals.append("NO TRADE")
-            remarks.append("; ".join(r))
+            remarks.append("; ".join(r) if r else "Conditions not met")
 
-    df['Signal'] = signals
-    df['Remark'] = remarks
+    df['Signal']  = signals
+    df['Remark']  = remarks
 
     return df.sort_index(ascending=False)
+
 
 # -------------------------------
 # MAIN UI
@@ -167,21 +185,20 @@ st.title("📊 Multi Asset Live Trading Dashboard")
 df = fetch_data(SYMBOL)
 
 if df.empty:
-    st.error("No data received")
+    st.error("No data received. The market may be closed or the symbol is invalid.")
     st.stop()
 
 latest = df.iloc[0]
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Instrument", selected_name)
-c2.metric("Close", round(latest['Close'],2))
-c3.metric("EMA20", round(latest['EMA20'],2))
+c2.metric("Close",  round(float(latest['Close']), 2))
+c3.metric("EMA20",  round(float(latest['EMA20']), 2))
 c4.metric("Signal", latest['Signal'])
 
-st.info(
-    f"🕒 Last Refresh (IST): {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')}"
-)
-
+# Countdown placeholder
+refresh_placeholder = st.empty()
+st.info(f"🕒 Last Refresh (IST): {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')}")
 st.warning(f"📌 Remark: {latest['Remark']}")
 
 if latest['Signal'] in ["CE BUY", "PE BUY"]:
@@ -189,7 +206,8 @@ if latest['Signal'] in ["CE BUY", "PE BUY"]:
 
 st.subheader("📋 Latest Data")
 
-show_cols = ['Close','High','Low','Open','Volume','EMA20','StochRSI','Signal','Remark']
+all_show_cols = ['Close', 'High', 'Low', 'Open', 'Volume', 'EMA20', 'StochRSI', 'Trend', 'Signal', 'Remark']
+show_cols = [c for c in all_show_cols if c in df.columns]
 
 st.dataframe(df[show_cols], use_container_width=True, height=420)
 
@@ -200,5 +218,13 @@ st.download_button(
     mime="text/csv"
 )
 
-st.caption("🔄 Auto refresh every 15 seconds")
+# -------------------------------
+# AUTO REFRESH — no external package needed
+# Counts down visually, then triggers st.rerun()
+# -------------------------------
+for remaining in range(REFRESH_SEC, 0, -1):
+    refresh_placeholder.caption(f"🔄 Refreshing in {remaining}s...")
+    time.sleep(1)
 
+refresh_placeholder.caption("🔄 Refreshing now...")
+st.rerun()
